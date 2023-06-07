@@ -48,7 +48,7 @@ void *chat_init(void * arg)
             printf("send error\n");
         }
         recv(fd,name,sizeof(name),0);
-        sprintf(temp,"------%s 进入群聊------",name);
+        sprintf(temp,"------%s进入群聊，当前聊天室%d人------",name,5-sem);
         printf("%s\n",temp);
         send_all(temp);
 
@@ -57,7 +57,10 @@ void *chat_init(void * arg)
             int len=recv(fd,buf,sizeof(buf),0);
             if(len<=0)//客户端退出
             {
-                sprintf(temp,"------%s 退出群聊------",name);
+                //可用信号量+1
+                //sem_post(&sem);
+                sem++;
+                sprintf(temp,"------%s退出群聊，当前聊天室%d人------",name,5-sem);
                 printf("%s\n",temp);
                 //找出clientfd中对应的fd并删除
                 for(int index=0;index<CLIENT_MAX;index++)
@@ -70,10 +73,7 @@ void *chat_init(void * arg)
                 }
                 closesocket(fd);
                 send_all(temp);
-
-                //可用信号量+1
-                //sem_post(&sem);
-                sem++;
+                
                 pthread_exit(NULL);
             }
             else{
